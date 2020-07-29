@@ -10,7 +10,7 @@ File description:
 
 > optimizer.py：                               a simple wrapper class for learning rate scheduling
 >
-> transformer_improved.py：       a PyTorch implementation of improved transformer in the paper
+> transformer_improved.py：       a PyTorch implementation of the improved transformer in the paper
 >
 > models.py：                                   use the "SingleTransformer" in our model.py to replace the "SingleRNN" in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation/blob/master/models.py">shi's model.py</a>
 
