@@ -1,6 +1,6 @@
 # DPTNet
 
-A PyTorch implementation of dual-path transformer network (DPTNet) based speech separation on wsj0-2mix described in the  paper "Dual-Path Transformer Network: Direct Context-Aware Modeling for End-to-End Monaural Speech Separation", which has been accepted by Interspeech2020.
+A PyTorch implementation of dual-path transformer network (DPTNet) based speech separation on wsj0-2mix described in the  paper  <a href="https://arxiv.org/abs/2007.13975">"Dual-Path Transformer Network: Direct Context-Aware Modeling for End-to-End Monaural Speech Separation"</a>, which has been accepted by Interspeech2020.  
 
 
 
