@@ -8,11 +8,11 @@ This implementation is based on <a href="https://github.com/ShiZiqiang/dual-path
 
 File description:
 
-> optimizer.py                               a simple wrapper class for learning rate scheduling
+> optimizer.py：                               a simple wrapper class for learning rate scheduling
 >
-> transformer_improved.py       a PyTorch implementation of improved transformer in the paper
+> transformer_improved.py：       a PyTorch implementation of improved transformer in the paper
 >
-> models.py                                   use the "SingleTransformer" in our model.py to replace the "SingleRNN" in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation/blob/master/models.py">shi's model.py</a>
+> models.py：                                   use the "SingleTransformer" in our model.py to replace the "SingleRNN" in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation/blob/master/models.py">shi's model.py</a>
 
 You only need to perform the above replacement based on the codes in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation">DPRNN</a>, then you can implement the method in <a href="https://arxiv.org/abs/2007.13975">dual-path transformer network (DPTNet)</a>.
 
