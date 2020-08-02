@@ -14,11 +14,11 @@ File description:
 >
 > models.py：                                   use the "SingleTransformer" in our model.py to replace the "SingleRNN" in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation/blob/master/models.py">shi's model.py</a>
 
-You only need to perform the above replacement based on the codes in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation">DPRNN</a>, then you can implement the method in <a href="https://arxiv.org/abs/2007.13975">dual-path transformer network (DPTNet)</a>.
+After performing the above replacement based on the codes in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation">DPRNN</a>, you can almost implement the method in <a href="https://arxiv.org/abs/2007.13975">dual-path transformer network (DPTNet)</a>.
 
 We obtain SDR 20.6 dB on wsj0-2mix and 16.8 dB on LS-2mix dataset.
 
-### I will organize the complete codes and upload them when I am free.
+### The complete codes I executed are somewhat redundant, I will organize the complete codes and upload them when I am free.
 
 ### References
 
