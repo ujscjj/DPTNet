@@ -8,17 +8,13 @@ This implementation is based on <a href="https://github.com/ShiZiqiang/dual-path
 
 File description:
 
-> optimizer.py：                               a simple wrapper class for learning rate scheduling
+> optimizer_dptnet.py：                               a simple wrapper class for learning rate scheduling
 >
 > transformer_improved.py：       a PyTorch implementation of the improved transformer in the paper
 >
-> models.py：                                   use the "SingleTransformer" in our model.py to replace the "SingleRNN" in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation/blob/master/models.py">shi's model.py</a>
-
-After performing the above replacement based on the codes in <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation">DPRNN</a>, you can almost implement the method in <a href="https://arxiv.org/abs/2007.13975">dual-path transformer network (DPTNet)</a>.
+> dpt_net.py:        where you can start
 
 We obtain SDR 20.6 dB on wsj0-2mix and 16.8 dB on LS-2mix dataset.
-
-#### (The complete codes I executed are somewhat redundant, I will organize the complete codes and upload them when I am free.  I am a little committed to looking for a job recently.)
 
 ### References
 
