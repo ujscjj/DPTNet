@@ -10,9 +10,9 @@ File description:
 
 > optimizer_dptnet.py：                               a simple wrapper class for learning rate scheduling
 >
-> transformer_improved.py：       a PyTorch implementation of the improved transformer in the paper
+> transformer_improved.py：                               a PyTorch implementation of the improved transformer in the paper
 >
-> dpt_net.py:        where you can start
+> dpt_net.py：                               where you can start
 
 We obtain SDR 20.6 dB on wsj0-2mix and 16.8 dB on LS-2mix dataset.
 
