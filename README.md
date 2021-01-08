@@ -16,6 +16,20 @@ File description:
 
 We obtain SDR 20.6 dB on wsj0-2mix and 16.8 dB on LS-2mix dataset.
 
+## Train
+
+Continue with:
+
+```
+CUDA_VISIBLE_DEVICES=0 python train.py --validate 0 --continue_from exp/temp_ctd/epoch14.pth.tar --save_folder exp/tmp_ctd
+```
+
+## Train a faster model
+
+```
+CUDA_VISIBLE_DEVICES=1 python train.py --print_freq 20 --validate 0 --W 16 --D 2 --save_folder exp/smaller_spectrogram
+```
+
 ### References
 
 <a href="https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation">https://github.com/ShiZiqiang/dual-path-RNNs-DPRNNs-based-speech-separation</a>
@@ -24,3 +38,6 @@ We obtain SDR 20.6 dB on wsj0-2mix and 16.8 dB on LS-2mix dataset.
 
 <a href="https://github.com/pytorch/pytorch/blob/eace0533985641d9c2f36e43e3de694aca886bd9/torch/nn/modules/transformer.py">https://github.com/pytorch/pytorch/blob/eace0533985641d9c2f36e43e3de694aca886bd9/torch/nn/modules/transformer.py</a>
 
+### Verions
+
+Working in pytorch 1.8, cuda 11.1

@@ -19,8 +19,7 @@ class Solver(object):
         # Training config
         self.use_cuda = args.use_cuda
         self.epochs = args.epochs
-        self.half_lr = args.half_lr
-        self.early_stop = args.early_stop
+        self.early_stop = args.early_stop # TODO
         self.max_norm = args.max_norm
         self.batch_size  = args.batch_size
         self.validate = args.validate
@@ -92,26 +91,7 @@ class Solver(object):
                 print('Learning rate adjusted to: {lr:.6f}'.format(
                     lr=optim_state['param_groups'][0]['lr']))
 
-            # # Adjust learning rate (halving)
-            # if self.half_lr:
-            #     if val_loss >= self.prev_val_loss:
-            #         self.val_no_impv += 1
-            #         if self.val_no_impv >= 3:
-            #             self.halving = True
-            #         if self.val_no_impv >= 10 and self.early_stop:
-            #             print("No imporvement for 10 epochs, early stopping.")
-            #             break
-            #     else:
-            #         self.val_no_impv = 0
-            # if self.halving:
-            #     optim_state = self.optimizer.state_dict()
-            #     optim_state['param_groups'][0]['lr'] = \
-            #         optim_state['param_groups'][0]['lr'] / 2.0
-            #     self.optimizer.load_state_dict(optim_state)
-            #     print('Learning rate adjusted to: {lr:.6f}'.format(
-            #         lr=optim_state['param_groups'][0]['lr']))
-            #     self.halving = False
-            # self.prev_val_loss = val_loss
+            # Learning rate is adjusted in optimizer
 
             best_file_path = os.path.join(
                 self.save_folder, 'temp_best.pth.tar')
@@ -121,11 +101,11 @@ class Solver(object):
                 if val_loss < self.best_val_loss:
                     self.best_val_loss = val_loss
                     torch.save(self.model.state_dict(), best_file_path)
-                    print("Find better validated model, saving to %s" % best_file_path)
+                    print("Found better validated model, saving to %s" % best_file_path)
             else:
                 if self.tr_loss[epoch] <= min(self.tr_loss):
                     torch.save(self.model.state_dict(), best_file_path)
-                    print("Find better validated model, saving to %s" % best_file_path)
+                    print("Found better model by train loss, saving to %s" % best_file_path)
 
     def _run_one_epoch(self, epoch, cross_valid=False):
         start = time.time()
@@ -154,7 +134,7 @@ class Solver(object):
                 mixture_lengths = mixture_lengths.to(device)
                 padded_source = padded_source.to(device)
             #print('padded_mixture.shape {}'.format(padded_mixture.shape))
-            # with torch.no_grad(): # for cross_valid
+            # with torch.no_grad(): # TODO: for cross_valid
             estimate_source = self.model(padded_mixture)
             #print('estimate_source.shape {}'.format(estimate_source.shape))
             loss, max_snr, estimate_source, reorder_estimate_source = \
