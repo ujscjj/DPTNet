@@ -2,6 +2,7 @@
 # Author: Kaituo XU
 
 import os
+import logging
 import time
 import torch
 import numpy
@@ -22,14 +23,16 @@ class Solver(object):
         self.early_stop = args.early_stop # TODO
         self.max_norm = args.max_norm
         self.batch_size  = args.batch_size
-        self.validate = args.validate
+        self.mode = args.mode
         # save and load model
         self.save_folder = args.save_folder
         self.checkpoint = args.checkpoint
         self.continue_from = args.continue_from
+        self.start_epoch = args.start_epoch
         self.model_path = args.model_path
         # logging
         self.print_freq = args.print_freq
+        self.logger = logging.getLogger('pytorch')
         # visualizing loss using visdom
         self.tr_loss = torch.Tensor(self.epochs)
         self.cv_loss = torch.Tensor(self.epochs)
@@ -40,7 +43,13 @@ class Solver(object):
         if self.continue_from:
             print('Loading checkpoint model %s' % self.continue_from)
             self.model.load_state_dict(torch.load(self.continue_from, map_location='cpu'))
-            self.start_epoch = 0
+            if 'train' in self.mode:
+                if self.start_epoch == 0:
+                    self.logger.warning('Loaded a checkpoint file but starting at ' \
+                          'epoch 0. This could lead to an incorrect lr schedule.')
+                if self.optimizer.warmup:
+                    self.logger.warning('Loaded a checkpoint file but warming up ' \
+                          'optimizer. This could lead to an incorrect lr schedule.')
         else:
             self.start_epoch = 0
         # Create save folder
@@ -50,69 +59,65 @@ class Solver(object):
         self.halving = False
         self.val_no_impv = 0
 
-    def train(self):
-        # Train model multi-epoches
+    def run(self):
+        if 'train' not in self.mode: # just do 1 iteration if not training
+            self.epochs = self.start_epoch + 1
         for epoch in range(self.start_epoch, self.epochs):
-            # Train one epoch
-            print("Training...")
-            self.model.train()  # Turn on BatchNorm & Dropout
             start = time.time()
-            tr_avg_loss = self._run_one_epoch(epoch)
-            print('-' * 85)
-            print('Train Summary | End of Epoch {0} | Time {1:.2f}s | '
-                  'Train Loss {2:.3f}'.format(
-                epoch + 1, time.time() - start, tr_avg_loss))
-            print('-' * 85)
-            self.tr_loss[epoch] = tr_avg_loss
-
-            # # Save model each epoch
-            if self.checkpoint:
-                file_path = os.path.join(
-                    self.save_folder, 'epoch%d.pth.tar' % (epoch + 1))
-                torch.save(self.model.state_dict(), file_path)
-                print('Saving checkpoint model to %s' % file_path)
+            # Train one epoch
+            if 'train' in self.mode:
+                self.logger.info("Training...")
+                self.model.train()  # Turn on BatchNorm & Dropout
+                tr_avg_loss = self._run_one_epoch(epoch)
+                print('-' * 85)
+                self.logger.info('Train Summary | End of Epoch {0} | Time {1:.2f}s | '
+                      'Train Loss {2:.3f}'.format(
+                    epoch + 1, time.time() - start, tr_avg_loss))
+                print('-' * 85)
+                self.tr_loss[epoch] = tr_avg_loss
+    
+                # Save model each epoch
+                if self.checkpoint:
+                    file_path = os.path.join(
+                        self.save_folder, 'epoch%d.pth.tar' % (epoch + 1))
+                    torch.save(self.model.state_dict(), file_path)
+                    self.logger.info('Saving checkpoint model to %s' % file_path)
+                
+                # Learning rate is adjusted in optimizer
+                optim_state = self.optimizer.state_dict()
+                self.logger.info('Learning rate at end of epoch {} is {:.6f}'.format(epoch, optim_state['param_groups'][0]['lr']))
 
             # Cross validation
-            if self.validate:
-                print('Cross validation...')
+            if 'eval' in self.mode:
+                self.logger.info('Cross validation...')
                 self.model.eval()  # Turn off Batchnorm & Dropout
                 val_loss = self._run_one_epoch(epoch, cross_valid=True)
                 print('-' * 85)
-                print('Valid Summary | End of Epoch {0} | Time {1:.2f}s | '
+                self.logger.info('Valid Summary | End of Epoch {0} | Time {1:.2f}s | '
                       'Valid Loss {2:.3f}'.format(
                     epoch + 1, time.time() - start, val_loss))
                 print('-' * 85)
 
-            if epoch % 2 == 0 and epoch != 0:
-                optim_state = self.optimizer.state_dict()
-                optim_state['param_groups'][0]['lr'] = \
-                    optim_state['param_groups'][0]['lr'] * 0.98
-                self.optimizer.load_state_dict(optim_state)
-                print('Learning rate adjusted to: {lr:.6f}'.format(
-                    lr=optim_state['param_groups'][0]['lr']))
-
-            # Learning rate is adjusted in optimizer
-
             best_file_path = os.path.join(
                 self.save_folder, 'temp_best.pth.tar')
             # Save the best model
-            if self.validate:
+            if 'eval' in self.mode:
                 self.cv_loss[epoch] = val_loss
                 if val_loss < self.best_val_loss:
                     self.best_val_loss = val_loss
                     torch.save(self.model.state_dict(), best_file_path)
-                    print("Found better validated model, saving to %s" % best_file_path)
-            else:
+                    self.logger.info("Found better validated model, saving to %s" % best_file_path)
+            elif 'train' in self.mode:
                 if self.tr_loss[epoch] <= min(self.tr_loss):
                     torch.save(self.model.state_dict(), best_file_path)
-                    print("Found better model by train loss, saving to %s" % best_file_path)
+                    self.logger.info("Found better model by train loss, saving to %s" % best_file_path)
 
     def _run_one_epoch(self, epoch, cross_valid=False):
         start = time.time()
         total_loss = 0
 
         data_loader = self.tr_loader if not cross_valid else self.cv_loader
-        print('data_loader.len {}'.format(len(data_loader)))
+        self.logger.info('data_loader.len {}'.format(len(data_loader)))
         for i, (data) in enumerate(data_loader):
             padded_mixture_, mixture_lengths_, padded_source_ = data
             seg_idx = numpy.random.randint(0, padded_mixture_.shape[0], self.batch_size)
